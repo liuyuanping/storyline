@@ -240,6 +240,7 @@ let narrative_init = function(narrative_data) {
 
 	});
 
+	set_data_table(narrative);
 	return narrative;
 };
 // });
@@ -284,7 +285,7 @@ function wrangle(data) {
 				+ '<br>标识: ' + new_scene.id
 				+ '<br>时间: ' + new_scene.time
 				+ '<br>地点: ' + new_scene.place
-				+ '<br>排序: ' + new_scene.order
+				+ '<br>序号: ' + new_scene.order
 				+ '<br>描述: ' + new_scene.description
 				// + ', characters: ' + new_scene.characters
 				+ '';
@@ -294,7 +295,7 @@ function wrangle(data) {
 				+ '<br>标识: ' + new_scene.id
 				+ '<br>时间: ' + new_scene.time
 				+ '<br>地点: ' + new_scene.place
-				+ '<br>排序: ' + new_scene.order
+				+ '<br>序号: ' + new_scene.order
 				// + '<br>描述: ' + new_scene.description
 				// + ', characters: ' + new_scene.characters
 				+ '';
@@ -311,6 +312,64 @@ function wrangle(data) {
 		return charactersMap[id];
 	}
 
+}
+
+var set_characters_data_table = function(characters) {
+	var characters_tbody = d3.select('#characters_tbody');
+	characters_tbody.selectAll('tr').remove();
+	characters_tbody.selectAll('tr')
+		.data(characters)
+		.enter()
+		.append('tr')
+		.html(function (d, i) {
+			var desc = d.description;
+			if (desc.length > 10) {
+				desc = desc.slice(0, 10) + '...';
+			}
+			return '<th scope="row" data-toggle="popover" title="序号" data-trigger="hover" data-content="' + (i + 1) + '">' + (i + 1) + '</th>\
+					      <td data-toggle="popover" title="姓名" data-trigger="hover" data-content="' + d.name + '">' + d.name + '</td>\
+					      <td data-toggle="popover" title="标识" data-trigger="hover" data-content="' + d.id + '">' + d.id + '</td>\
+					      <td data-toggle="popover" title="类别" data-trigger="hover" data-content="' + d.affiliation + '">' + d.affiliation + '</td>\
+					      <td data-toggle="popover" title="描述" data-trigger="hover" data-content="' + d.description + '">' + desc + '</td>\
+					      <td data-toggle="popover" title="不透明度" data-trigger="hover" data-content="' + d.opacity + '">' + d.opacity + '</td>\
+					      ';
+		});
+	$('[data-toggle="popover"]').popover();
+}
+
+var set_scenes_data_table = function (scenes) {
+	var scenes_tbody = d3.select('#scenes_tbody');
+	scenes_tbody.selectAll('tr').remove();
+	var scenes_tbody_tr = scenes_tbody.selectAll('tr')
+		.data(scenes)
+		.enter()
+		.append('tr')
+		.html(function (d, i) {
+			var desc = d.description;
+			if (desc.length > 10) {
+				desc = desc.slice(0, 10) + '...';
+			}
+			var characters_str = d.characters.map(function (d) { return d.name; }) + '';
+			var characters_str_ = characters_str;
+			if (characters_str_.length > 10) {
+				var characters_str_ = characters_str_.slice(0, 10) + '...';
+			}
+			return '<th scope="row" data-toggle="popover" title="序号" data-trigger="hover" data-content="' + d.order + '">' + d.order + '</th>\
+					      <td data-toggle="popover" title="标题" data-trigger="hover" data-content="' + d.title + '">' + d.title + '</td>\
+					      <td data-toggle="popover" title="标识" data-trigger="hover" data-content="' + d.id + '">' + d.id + '</td>\
+					      <td data-toggle="popover" title="时间" data-trigger="hover" data-content="' + d.time + '">' + d.time + '</td>\
+					      <td data-toggle="popover" title="地点" data-trigger="hover" data-content="' + d.place + '">' + d.place + '</td>\
+					      <td data-toggle="popover" title="描述" data-trigger="hover" data-content="' + d.description + '">' + desc + '</td>\
+					      <td data-toggle="popover" title="不透明度" data-trigger="hover" data-content="' + d.opacity + '">' + d.opacity + '</td>\
+					      <td data-toggle="popover" title="人物集" data-trigger="hover" data-content="' + characters_str + '">' + characters_str_ + '</td>\
+					      ';
+		});
+	$('[data-toggle="popover"]').popover();
+}
+
+var set_data_table = function (narrative_context) {
+	set_characters_data_table(narrative_context.characters());
+	set_scenes_data_table(narrative_context.scenes());
 }
 
 var low_opacity = 0.2;
@@ -380,7 +439,7 @@ var dragged = function (d) {
 		(parseInt(dragged_obj.style('top').slice(0, -2)) + d3.event.sourceEvent.movementY) + 'px');
 	dragged_obj.style('z-index', 1);
 };
-var character_info_title = '<h2>人物</h2>';
+var character_info_title = '<h2  data-toggle="modal" data-target="#StoryLineCharactersDataModal">人物</h2>';
 var character_info = d3.select('body').append('div')
 					.attr('class', 'character_info')
 					.style('opacity', high_opacity)
@@ -397,7 +456,7 @@ var set_character_info = function (msg) {
 	character_info.html(character_info_title + msg)
 		.style('opacity', high_opacity);
 };
-var scene_info_title = '<h2>事件</h2>';
+var scene_info_title = '<h2  data-toggle="modal" data-target="#StoryLineScenesDataModal">事件</h2>';
 var scene_info = d3.select('body').append('div')
 					.attr('class', 'scene_info')
 					.style('opacity', high_opacity)

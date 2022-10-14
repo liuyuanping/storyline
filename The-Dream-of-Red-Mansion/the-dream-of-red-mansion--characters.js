@@ -366,14 +366,7 @@ characters_of_the_dream = [
         "description": "小鸠儿，何婆之女，春燕之妹。\
             很少出场，也没有什么独立的故事，但与小鸠儿有关联的人物较多。各自展开故事情节。",
         "opacity": 1
-    },
-    {
-        "id": "renwu_template_id",
-        "name": "人物模板",
-        "affiliation": "unknown",
-        "description": "人物模板描述",
-        "opacity": 1
-    },
+    }
 ];
 
 
